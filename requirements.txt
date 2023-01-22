@@ -1,0 +1,6 @@
+boto3==1.25.0
+fastapi==0.89.1
+pydantic==1.10.4
+python-dotenv==0.21.0
+requests==2.27.1
+SQLAlchemy==1.4.32
