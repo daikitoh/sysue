@@ -47,7 +47,7 @@ def post_recipe(recipe: RequestRecipeBase = Body(...), image: UploadFile = File(
         load_dotenv()
         lamb = os.environ.get('LAMBDA')
 
-        # response = upload_file(image, recipe.title)
+        # response = upload_file(image)
         response = requests.post(lamb, files={'file': (image.filename, image.file)})
         
         print(response)
