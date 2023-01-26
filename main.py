@@ -6,7 +6,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from database import session
 from model import Recipe, Ingredient, Allergen, Tag, Instruction, RecipeBase, RecipeIngredient, RecipeTag
-# from upload import upload_file
+from upload import upload_file
 import requests
 from dotenv import load_dotenv
 import os
@@ -47,8 +47,8 @@ def post_recipe(recipe: RequestRecipeBase = Body(...), image: UploadFile = File(
         load_dotenv()
         lamb = os.environ.get('LAMBDA')
 
-        # response = upload_file(image)
-        response = requests.post(lamb, files={'file': (image.filename, image.file)})
+        response = upload_file(image)
+        # response = requests.post(lamb, files={'file': (image.filename, image.file)})
         
         print(response)
         print(response.json())
