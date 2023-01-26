@@ -96,6 +96,7 @@ def post_recipe(recipe: RequestRecipeBase = Body(...), image: UploadFile = File(
                 else:
                     db_ring.ingredient_id = res.ingredient_id
 
+                print(db_ring)
                 db_rings.append(db_ring)
 
         session.add_all(db_rings)
@@ -121,6 +122,7 @@ def post_recipe(recipe: RequestRecipeBase = Body(...), image: UploadFile = File(
                 else:
                     db_rtag.tag_id = res.tag_id
 
+                print(db_rtag)
                 db_rtags.append(db_rtag)
 
         session.add_all(db_rtags)
@@ -133,6 +135,7 @@ def post_recipe(recipe: RequestRecipeBase = Body(...), image: UploadFile = File(
                 db_inst.number = index
                 db_inst.content = inst
                 session.add(db_inst)
+                print(db_inst)
 
         session.commit()
 
