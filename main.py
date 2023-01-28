@@ -112,11 +112,11 @@ def post_recipe(recipe: RequestRecipeBase = Body(...), image: UploadFile = File(
                 db_rtag = RecipeTag()
                 db_rtag.recipe_id = id
 
-                res = session.query(Tag).filter(Tag.name == tag.name).first()
+                res = session.query(Tag).filter(Tag.name == tag).first()
                 if res is None:
                     # Create Tag
                     db_tag = Tag()
-                    db_tag.name = tag.name
+                    db_tag.name = tag
                     session.add(db_tag)
                     session.flush()
 
