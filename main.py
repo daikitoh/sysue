@@ -79,7 +79,7 @@ def post_recipe(recipe: RequestRecipeBase = Body(...), image: UploadFile = File(
         db_rings = list()
         print(recipe.ingredients)
         for ring in recipe.ingredients:
-            if not ring and not ring.name and not ring.quantity:
+            if ring and ring.name and ring.quantity:
                 res = session.query(Ingredient).filter(Ingredient.name == ring.name).first()
 
                 db_ring = RecipeIngredient()
@@ -108,7 +108,7 @@ def post_recipe(recipe: RequestRecipeBase = Body(...), image: UploadFile = File(
         print(recipe.tags)
         db_rtags = list()
         for tag in recipe.tags:
-            if not tag and not tag.name:
+            if tag and tag.name:
                 db_rtag = RecipeTag()
                 db_rtag.recipe_id = id
 
@@ -132,7 +132,7 @@ def post_recipe(recipe: RequestRecipeBase = Body(...), image: UploadFile = File(
         # Create Instructions
         print(recipe.instructions)
         for index, inst in enumerate(recipe.instructions):
-            if not inst and not inst.content:
+            if inst and inst.content:
                 db_inst = Instruction()
                 db_inst.recipe_id = id
                 db_inst.number = index
