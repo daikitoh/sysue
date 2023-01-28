@@ -24,5 +24,5 @@ class RequestRecipeBase(BaseModel):
             return cls(**json.loads(value))
         return value
 
-    class Config:
-        orm_mode = True
+    # class Config:
+    #     orm_mode = True
