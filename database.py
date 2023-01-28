@@ -9,10 +9,10 @@ load_dotenv()
 HOST = os.environ.get('HOST')
 PORT = os.environ.get('PORT')
 DB_NAME = os.environ.get('DB_NAME')
-USER = os.environ.get('USER')
+DB_USER = os.environ.get('USER')
 PASSWORD = os.environ.get('PASSWORD')
 
-uri = f'mysql+pymysql://{USER}:{PASSWORD}@{HOST}/{DB_NAME}?charset=utf8'
+uri = f'mysql+pymysql://{DB_USER}:{PASSWORD}@{HOST}/{DB_NAME}?charset=utf8'
 print(uri)
 ENGINE = create_engine(
     uri,
