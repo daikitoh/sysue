@@ -108,7 +108,7 @@ def post_recipe(recipe: RequestRecipeBase = Body(...), image: UploadFile = File(
         print(recipe.tags)
         db_rtags = list()
         for tag in recipe.tags:
-            if tag and tag.name:
+            if tag:
                 db_rtag = RecipeTag()
                 db_rtag.recipe_id = id
 
@@ -132,7 +132,7 @@ def post_recipe(recipe: RequestRecipeBase = Body(...), image: UploadFile = File(
         # Create Instructions
         print(recipe.instructions)
         for index, inst in enumerate(recipe.instructions):
-            if inst and inst.content:
+            if inst and inst:
                 db_inst = Instruction()
                 db_inst.recipe_id = id
                 db_inst.number = index
