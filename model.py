@@ -26,29 +26,29 @@ class RecipeIngredient(Base):
     ingredient_id = Column(Integer)
     quantity = Column(String(20))
 
-class Allergen():
+class Allergen(Base):
     __tablename__ = 'allergens'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(20))
 
-class RecipeAllergen():
+class RecipeAllergen(Base):
     __tablename__ = 'recipe_allergens'
     id = Column(Integer, primary_key=True, autoincrement=True)
     recipe_id = Column(Integer)
     allergen_id = Column(Integer, primary_key=True)
 
-class Tag():
+class Tag(Base):
     __tablename__ = 'tags'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(20))
 
-class RecipeTag():
+class RecipeTag(Base):
     __tablename__ = 'recipe_tags'
     id = Column(Integer, primary_key=True, autoincrement=True)
     recipe_id = Column(Integer)
     tag_id = Column(Integer, primary_key=True)
 
-class Instruction():
+class Instruction(Base):
     __tablename__ = 'instructions'
     id = Column(Integer, primary_key=True, autoincrement=True)
     recipe_id = Column(Integer)
