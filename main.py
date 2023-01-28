@@ -40,7 +40,7 @@ def index(request: Request):
         }
     )
 
-@app.post("/api/post_recipe")
+@app.post("/api/post_recipe/")
 def post_recipe(recipe: RequestRecipeBase = Body(...), image: UploadFile = File(...)):
     try:
         # 画像アップロード
