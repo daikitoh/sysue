@@ -71,30 +71,30 @@ def post_recipe(recipe: RequestRecipeBase = Body(...), image: UploadFile = File(
         session.add(db_recipe)
         session.flush()
 
-        id = db_recipe.recipe_id
+        id = db_recipe.id
 
         # Create RecipeIngredients
         # ingredientが存在すればid取得、なければ作成してid返却
         # 本来なら最初からid
         db_rings = list()   
-        for ing in recipe.ingredients:
-            if not ing and not ing.ingredient_name and not ing.quantity:
-                res = session.query(Ingredient).filter(Ingredient.ingredient_name == ing.ingredient_name).first()
+        for ring in recipe.ingredients:
+            if not ring and not ring.name and not ring.quantity:
+                res = session.query(Ingredient).filter(Ingredient.name == ring.name).first()
 
                 db_ring = RecipeIngredient()
                 db_ring.recipe_id = id
-                db_ring.quantity = ing.ingredient_name
+                db_ring.quantity = ring.quantity
 
                 if res is None:
                     # Create Ingredient
                     db_ing = Ingredient()
-                    db_ing.ingredient_name = ing.ingredient_name
+                    db_ing.name = ring.name
                     session.add(db_ing)
                     session.flush()
 
-                    db_ring.ingredient_id = db_ing.ingredient_id
+                    db_ring.ingredient_id = db_ing.id
                 else:
-                    db_ring.ingredient_id = res.ingredient_id
+                    db_ring.ingredient_id = res.id
 
                 print(db_ring)
                 db_rings.append(db_ring)
@@ -106,21 +106,21 @@ def post_recipe(recipe: RequestRecipeBase = Body(...), image: UploadFile = File(
         # Create RecipeTags
         db_rtags = list()
         for tag in recipe.tags:
-            if not tag and not tag.tag_name:
+            if not tag and not tag.name:
                 db_rtag = RecipeTag()
                 db_rtag.recipe_id = id
 
-                res = session.query(Tag).filter(Tag.tag_name == tag.tag_name).first()
+                res = session.query(Tag).filter(Tag.name == tag.name).first()
                 if res is None:
                     # Create Tag
                     db_tag = Tag()
-                    db_tag.tag_name = tag.name
+                    db_tag.name = tag.name
                     session.add(db_tag)
                     session.flush()
 
-                    db_rtag.tag_id = db_tag.tag_id
+                    db_rtag.tag_id = db_tag.id
                 else:
-                    db_rtag.tag_id = res.tag_id
+                    db_rtag.tag_id = res.id
 
                 print(db_rtag)
                 db_rtags.append(db_rtag)

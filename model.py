@@ -5,7 +5,7 @@ from typing import Optional, List
 
 class Recipe(Base):
     __tablename__ = 'recipes'
-    recipe_id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     category_id = Column(Integer, nullable=False)
     title = Column(String(50), nullable=False)
     image = Column(String(255), nullable=False)
@@ -16,41 +16,41 @@ class Recipe(Base):
 
 class Ingredient(Base):
     __tablename__ = 'ingredients'
-    ingredient_id = Column(Integer, primary_key=True, autoincrement=True)
-    ingredient_name = Column(String(50))
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(50))
 
 class RecipeIngredient(Base):
     __tablename__ = 'recipe_ingredients'
-    recipe_ingredient_id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     recipe_id = Column(Integer)
     ingredient_id = Column(Integer)
     quantity = Column(String(20))
 
 class Allergen():
     __tablename__ = 'allergens'
-    allergen_id = Column(Integer, primary_key=True, autoincrement=True)
-    allergen_name = Column(String(20))
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(20))
 
 class RecipeAllergen():
     __tablename__ = 'recipe_allergens'
-    recipe_allergen_id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     recipe_id = Column(Integer)
     allergen_id = Column(Integer, primary_key=True)
 
 class Tag():
     __tablename__ = 'tags'
-    tag_id = Column(Integer, primary_key=True, autoincrement=True)
-    tag_name = Column(String(20))
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(20))
 
 class RecipeTag():
     __tablename__ = 'recipe_tags'
-    recipe_tag_id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     recipe_id = Column(Integer)
     tag_id = Column(Integer, primary_key=True)
 
 class Instruction():
     __tablename__ = 'instructions'
-    instruction_id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     recipe_id = Column(Integer)
     number = Column(Integer)
     content = Column(String(255))
@@ -60,11 +60,11 @@ class Instruction():
 #  For Responses
 #  For Search
 class IngredientBase(BaseModel):
-    ingredient_id: int
-    ingredient_name: str
+    id: int
+    name: str
 
 class RecipeIngredientBase(BaseModel):
-    ingredient_name: str
+    name: str
     quantity: str
 
 class RecipeThumbBase(BaseModel):
