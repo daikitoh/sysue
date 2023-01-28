@@ -13,7 +13,6 @@ DB_USER = os.environ.get('DB_USER')
 PASSWORD = os.environ.get('PASSWORD')
 
 uri = f'mysql+pymysql://{DB_USER}:{PASSWORD}@{HOST}/{DB_NAME}?charset=utf8'
-print(uri)
 ENGINE = create_engine(
     uri,
     encoding='utf-8',

@@ -76,7 +76,8 @@ def post_recipe(recipe: RequestRecipeBase = Body(...), image: UploadFile = File(
         # Create RecipeIngredients
         # ingredientが存在すればid取得、なければ作成してid返却
         # 本来なら最初からid
-        db_rings = list()   
+        db_rings = list()
+        print(recipe.ingredients)
         for ring in recipe.ingredients:
             if not ring and not ring.name and not ring.quantity:
                 res = session.query(Ingredient).filter(Ingredient.name == ring.name).first()
@@ -104,6 +105,7 @@ def post_recipe(recipe: RequestRecipeBase = Body(...), image: UploadFile = File(
         # Create RecipeAllergens
 
         # Create RecipeTags
+        print(recipe.tags)
         db_rtags = list()
         for tag in recipe.tags:
             if not tag and not tag.name:
@@ -128,6 +130,7 @@ def post_recipe(recipe: RequestRecipeBase = Body(...), image: UploadFile = File(
         session.add_all(db_rtags)
 
         # Create Instructions
+        print(recipe.instructions)
         for index, inst in enumerate(recipe.instructions):
             if not inst and not inst.content:
                 db_inst = Instruction()
