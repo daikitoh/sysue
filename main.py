@@ -81,7 +81,7 @@ def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File()):
         print(recipe.ingredients)
         for ring in recipe.ingredients:
             if ring and ring.name and ring.quantity:
-                res = session.query(Ingredient).filter(Ingredient.name == func.bibary(ring.name)).first()
+                res = session.query(Ingredient).filter(Ingredient.name == func.binary(ring.name)).first()
 
                 db_ring = RecipeIngredient()
                 db_ring.recipe_id = id
