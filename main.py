@@ -41,7 +41,7 @@ def index(request: Request):
     )
 
 @app.post("/api/post_recipe/")
-def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File(...)):
+def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File()):
     try:
         # 画像アップロード
         load_dotenv()
