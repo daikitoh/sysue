@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 import os
 # import json
 from schemas.recipe import RequestRecipeBase
+from sqlalchemy import func
 
 app = FastAPI()
 
@@ -57,7 +58,7 @@ def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File()):
 
         # db登録
         # Check category_id
-        if recipe.category_id < 1:
+        if recipe.category_id < 1 or recipe.servings < 1:
             raise HTTPException(status_code='404', detail='Category Error')
 
         # Create Recipe
@@ -80,7 +81,7 @@ def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File()):
         print(recipe.ingredients)
         for ring in recipe.ingredients:
             if ring and ring.name and ring.quantity:
-                res = session.query(Ingredient).filter(Ingredient.name == ring.name).first()
+                res = session.query(Ingredient).filter(Ingredient.name == func.bibary(ring.name)).first()
 
                 db_ring = RecipeIngredient()
                 db_ring.recipe_id = id
@@ -112,7 +113,7 @@ def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File()):
                 db_rtag = RecipeTag()
                 db_rtag.recipe_id = id
 
-                res = session.query(Tag).filter(Tag.name == tag).first()
+                res = session.query(Tag).filter(Tag.name == func.binary(tag)).first()
                 if res is None:
                     # Create Tag
                     db_tag = Tag()
@@ -135,7 +136,7 @@ def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File()):
             if inst and inst:
                 db_inst = Instruction()
                 db_inst.recipe_id = id
-                db_inst.number = index
+                db_inst.number = index + 1
                 db_inst.content = inst
                 session.add(db_inst)
                 print(db_inst)
