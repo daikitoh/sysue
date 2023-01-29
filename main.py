@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, Body, HTTPException
+from fastapi import FastAPI, UploadFile, File, Body, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.requests import Request
@@ -41,7 +41,7 @@ def index(request: Request):
     )
 
 @app.post("/api/post_recipe/")
-def post_recipe(recipe: RequestRecipeBase = Body(...), image: UploadFile = File(...)):
+def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File(...)):
     try:
         # 画像アップロード
         load_dotenv()
