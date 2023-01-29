@@ -5,7 +5,7 @@ from fastapi.requests import Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from database import session
-from model import Recipe, Ingredient, Allergen, Tag, Instruction, RecipeBase, RecipeIngredient, RecipeTag
+from model import Recipe, Ingredient, Allergen, Tag, Instruction, RecipeBase, RecipeIngredient, RecipeTag, RecipeAllergen
 # from upload import upload_file
 import requests
 from dotenv import load_dotenv
@@ -78,7 +78,6 @@ def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File()):
         # ingredientが存在すればid取得、なければ作成してid返却
         # 本来なら最初からid
         db_rings = list()
-        print(recipe.ingredients)
         for ring in recipe.ingredients:
             if ring and ring.name and ring.quantity:
                 res = session.query(Ingredient).filter(Ingredient.name == func.binary(ring.name)).first()
@@ -98,15 +97,19 @@ def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File()):
                 else:
                     db_ring.ingredient_id = res.id
 
-                print(db_ring)
                 db_rings.append(db_ring)
 
         session.add_all(db_rings)
 
         # Create RecipeAllergens
+        for al in recipe.allergens:
+            if al:
+                db_al = RecipeAllergen()
+                db_al.recipe_id = id
+                db_al.allergen_id = al
+                session.add(db_al)
 
         # Create RecipeTags
-        print(recipe.tags)
         db_rtags = list()
         for tag in recipe.tags:
             if tag:
@@ -125,21 +128,18 @@ def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File()):
                 else:
                     db_rtag.tag_id = res.id
 
-                print(db_rtag)
                 db_rtags.append(db_rtag)
 
         session.add_all(db_rtags)
 
         # Create Instructions
-        print(recipe.instructions)
         for index, inst in enumerate(recipe.instructions):
-            if inst and inst:
+            if inst:
                 db_inst = Instruction()
                 db_inst.recipe_id = id
                 db_inst.number = index + 1
                 db_inst.content = inst
                 session.add(db_inst)
-                print(db_inst)
 
         session.commit()
 

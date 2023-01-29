@@ -10,7 +10,7 @@ class RequestRecipeBase(BaseModel):
     description: Optional[str]
     servings: int
     ingredients: List[RecipeIngredientBase] #本来idで指定
-    allergens: Optional[List[str]]
+    allergens: Optional[List[int]]
     tags: Optional[List[str]]
     instructions: List[str]
 
