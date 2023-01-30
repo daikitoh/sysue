@@ -33,7 +33,7 @@ class RecipeThumbBase(BaseModel):
     # servings: int
     # ingredients: List[Ingredient]
     # allergens: Optional[List[str]]
-    tags: Optional[List[str]]
+    # tags: Optional[List[str]]
     # instructions: List[str]
 
     class Config:

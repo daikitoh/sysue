@@ -172,10 +172,12 @@ def get_recipes(
         joins.append((
             RecipeIngredient, and_(RecipeIngredient.recipe_id == Recipe.id, RecipeIngredient.ingredient_id.in_(ingredients))
             ))
+    if tags:
+        joins.append((
+            RecipeTag, and_(RecipeTag.recipe_id == Recipe.id, RecipeTag.tag_id.in_(tags))
+        ))
 
-    q = session.query(Recipe.id, Recipe.category_id, Recipe.title, Recipe.image, func.group_concat(Tag.name))\
-        .join(RecipeTag, RecipeTag.recipe_id == Recipe.id)\
-        .join(Tag, Tag.id == RecipeTag.tag_id)\
+    q = session.query(Recipe.id, Recipe.category_id, Recipe.title, Recipe.image,)\
         .filter(Recipe.category_id == category_id if category_id else True)\
         .filter(Recipe.title.like("%" + title + "%") if title else True)\
         .filter(Recipe.description.like("%" + description + "%") if description else True)\
@@ -188,30 +190,25 @@ def get_recipes(
     for j in joins:
         q = q.join(*j)
 
-    res = q.group_by(Recipe.id).limit(100).all()
-    print(res)
-    return res
-
+    return q.group_by(Recipe.id).limit(100).all()
 
 @app.get("/api/recipe/", response_model=RecipeBase)
 def get_recipe(id: int):
-    return session.query(
-        Recipe,
-        func.goup_concat(Ingredient.name),
-        func.goup_concat(RecipeIngredient.quantity),
-        func.goup_concat(Allergen.name),
-        func.goup_concat(Tag.name),
-        func.goup_concat(Instruction.number),
-        func.goup_concat(Instruction.content)
-    )\
-        .filter(Recipe.id == id)\
-            .join(RecipeIngredient, RecipeIngredient.recipe_id == Recipe.id)\
-                .join(Ingredient, Ingredient.id == RecipeIngredient.ingredient_id)\
-                    .join(RecipeAllergen, RecipeAllergen.recipe_id == Recipe.id)\
-                        .join(Tag, Tag.id == RecipeTag.id)\
-                            .join(RecipeTag, RecipeTag.recipe_id == Recipe.id)\
-                                .join(Instruction, Instruction.recipe_id == Recipe.id)\
-                                    .group_by(Recipe.id).limit(100).first()
+    recipe = session.query(Recipe).filter(Recipe.id == id).first()
+
+    recipe.ingredients = session.query(Ingredient.name, RecipeIngredient.quantity)\
+        .join(RecipeIngredient, and_(RecipeIngredient.ingredient_id == Ingredient.id, RecipeIngredient.recipe_id == id)).all()
+
+    recipe.allergens = session.query(Allergen.name)\
+        .join(RecipeAllergen, and_(RecipeAllergen.allergen_id == Allergen.id, RecipeAllergen.recipe_id == id)).all()
+
+    recipe.tags = session.query(Tag.name)\
+        .join(RecipeTag, and_(RecipeTag.tag_id == Tag.id, RecipeTag.recipe_id == id)).all()
+
+    recipe.instructions = session.query(Instruction.number, Instruction.content)\
+        .filter(Instruction.recipe_id == id).order_by(Instruction.number).all()
+
+    return recipe
 
 @app.get("/api/ingredients/", response_model=List[IngredientBase])
 def get_ingredients(keyword: str):
