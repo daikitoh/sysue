@@ -14,6 +14,7 @@ import os
 from schemas.recipe import RequestRecipeBase, RecipeThumbBase, RecipeBase, IngredientBase, RecipeIngredientBase,TagBase, RecipeTagBase, RecipeAllergenBase, RecipeInstructionBase
 from sqlalchemy import func, and_
 from typing import List
+from compress import compress
 
 app = FastAPI()
 
@@ -49,11 +50,13 @@ def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File()):
         load_dotenv()
         lamb = os.environ.get('LAMBDA')
 
+        thumb = compress(image)
+
         # response = upload_file(image)
-        response = requests.post(lamb, files={'file': (image.filename, image.file)})
-        
-        print(response)
-        print(response.json())
+        response = requests.post(lamb, files={
+            'image': (image.filename, image.file),
+            'thumb': (image.filename, thumb)
+            })
 
         image_url = response.json()
 
