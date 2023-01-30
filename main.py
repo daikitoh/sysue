@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, Body, HTTPException, Form
+from fastapi import FastAPI, UploadFile, File, Body, HTTPException, Form, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.requests import Request
@@ -163,9 +163,9 @@ def get_recipes(
     title: str = None,
     description: str = None,
     servings: int = None,
-    ingredients: List[int] = None,
-    allergens: List[int] = None,
-    tags: List[str] = None  # id?
+    ingredients: List[int] = Query(default=None),
+    allergens: List[int] = Query(default=None),
+    tags: List[str] = Query(default=None)  # id?
 ):
     joins = []
     if ingredients:
