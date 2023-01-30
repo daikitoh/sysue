@@ -169,9 +169,9 @@ def get_recipes(
 ):
     joins = []
     if ingredients:
-        joins.append(RecipeIngredient, and_(RecipeIngredient.recipe_id == Recipe.id, RecipeIngredient.ingredient_id.in_(ingredients)))
+        joins.append((RecipeIngredient, and_(RecipeIngredient.recipe_id == Recipe.id, RecipeIngredient.ingredient_id.in_(ingredients))))
     if tags:
-        joins.append(RecipeTag, and_(RecipeTag.recipe_id == Recipe.id, RecipeTag.tag_id.in_(tags)))
+        joins.append((RecipeTag, and_(RecipeTag.recipe_id == Recipe.id, RecipeTag.tag_id.in_(tags))))
 
     q = session.query(Recipe.id, Recipe.category_id, Recipe.title, Recipe.image, func.group_concat(Tag.name))\
         .filter(Recipe.category_id == category_id if category_id else True)\
@@ -182,7 +182,7 @@ def get_recipes(
                             session.query(RecipeAllergen.recipe_id).filter(RecipeAllergen.allergen_id.in_(allergens))
                         ) if allergens else True)
     for j in joins:
-        q = q.join(j)
+        q = q.join(*j)
 
     return q.group_by(Recipe.id).all()
 
