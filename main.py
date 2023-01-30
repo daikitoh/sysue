@@ -189,6 +189,7 @@ def get_recipes(
         q = q.join(*j)
 
     res = q.group_by(Recipe.id).limit(100).all()
+    print(res)
     return res
 
 
