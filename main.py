@@ -184,7 +184,7 @@ def get_recipes(
     for j in joins:
         q = q.join(j)
 
-    q.group_by(Recipe.id).all()
+    return q.group_by(Recipe.id).all()
 
 @app.get("/api/recipe/")
 def get_recipe(id: int):
