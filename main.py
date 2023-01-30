@@ -168,6 +168,9 @@ def get_recipes(
     allergens: List[int] = Query(default=None),
     tags: List[int] = Query(default=None)  # id?
 ):
+    if not category_id and not title and not description and not servings and not ingredients and not allergens and not tags:
+        raise HTTPException(status_code=404, detail='Error')
+        
     try:
         joins = []
         if ingredients:
