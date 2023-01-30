@@ -186,7 +186,7 @@ def get_recipes(
                                     .filter(RecipeTag.tag_id.in_(tags) if tags else True)
 
     for j in joins:
-        q = q.outerjoin(*j)
+        q = q.join(*j)
 
     return q.group_by(Recipe.id).all()
 
