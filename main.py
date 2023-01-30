@@ -188,7 +188,9 @@ def get_recipes(
     for j in joins:
         q = q.join(*j)
 
-    return q.group_by(Recipe.id).all()
+    res = q.group_by(Recipe.id).limit(100).all()
+    print(res)
+    return res
 
 @app.get("/api/recipe/")
 def get_recipe(id: int):
@@ -208,14 +210,14 @@ def get_recipe(id: int):
                         .join(Tag, Tag.id == RecipeTag.id)\
                             .join(RecipeTag, RecipeTag.recipe_id == Recipe.id)\
                                 .join(Instruction, Instruction.recipe_id == Recipe.id)\
-                                    .group_by(Recipe.id).all()
+                                    .group_by(Recipe.id).limit(100).all()
 
 @app.get("/api/ingredients/")
 def get_ingredients(keyword: str):
     return session.query(Ingredient)\
-        .filter(Ingredient.name.like("%" + keyword + "%")).all()
+        .filter(Ingredient.name.like("%" + keyword + "%")).limit(100).all()
 
 @app.get("/api/tags/")
 def get_tags(keyword: str):
     return session.query(Tag)\
-        .filter(Tag.name.like("%" + keyword + "%")).all()
+        .filter(Tag.name.like("%" + keyword + "%")).limit(100).all()
