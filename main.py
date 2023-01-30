@@ -45,7 +45,6 @@ def index(request: Request):
 @app.post("/api/post_recipe/")
 def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File()):
     try:
-        print("post start")
         # 画像アップロード
         load_dotenv()
         lamb = os.environ.get('LAMBDA')
@@ -142,7 +141,8 @@ def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File()):
 
         session.commit()
 
-    except:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=404, detail='Error')
 
     finally:
