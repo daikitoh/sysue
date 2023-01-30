@@ -157,7 +157,7 @@ def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File()):
         'status': 'OK'
     }
 
-@app.get("/api/recipes/", response_model=RecipeThumbBase)
+@app.get("/api/recipes/", response_model=List[RecipeThumbBase])
 def get_recipes(
     category_id: int = None,
     title: str = None,
@@ -210,14 +210,14 @@ def get_recipe(id: int):
                         .join(Tag, Tag.id == RecipeTag.id)\
                             .join(RecipeTag, RecipeTag.recipe_id == Recipe.id)\
                                 .join(Instruction, Instruction.recipe_id == Recipe.id)\
-                                    .group_by(Recipe.id).limit(100).all()
+                                    .group_by(Recipe.id).limit(100).first()
 
-@app.get("/api/ingredients/", response_model=IngredientBase)
+@app.get("/api/ingredients/", response_model=List[IngredientBase])
 def get_ingredients(keyword: str):
     return session.query(Ingredient)\
         .filter(Ingredient.name.like("%" + keyword + "%")).limit(100).all()
 
-@app.get("/api/tags/", response_model=TagBase)
+@app.get("/api/tags/", response_model=List[TagBase])
 def get_tags(keyword: str):
     return session.query(Tag)\
         .filter(Tag.name.like("%" + keyword + "%")).limit(100).all()
