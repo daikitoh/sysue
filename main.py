@@ -44,19 +44,19 @@ def index(request: Request):
     )
 
 @app.post("/api/post_recipe/")
-def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File()):
+async def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File()):
     try:
         # 画像アップロード
         load_dotenv()
         lamb = os.environ.get('LAMBDA')
 
-        thumb = compress(image)
+        thumb = await compress(image)
 
         # response = upload_file(image)
         response = requests.post(lamb, files={
             'image': (image.filename, image.file),
             'thumb': (image.filename, thumb)
-            })
+        })
 
         image_url = response.json()
 
