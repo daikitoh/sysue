@@ -5,7 +5,7 @@ from fastapi.requests import Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from database import session
-from model import Recipe, Ingredient, Allergen, Tag, Instruction, RecipeBase, RecipeIngredient, RecipeTag, RecipeAllergen
+from model import Recipe, Ingredient, Allergen, Tag, Instruction, RecipeIngredient, RecipeTag, RecipeAllergen
 # from upload import upload_file
 import requests
 from dotenv import load_dotenv
