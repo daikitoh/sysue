@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from model import RecipeIngredientBase
 import json
 
-# For Requests
+# For post
 class RequestRecipeBase(BaseModel):
     category_id: int
     title: str

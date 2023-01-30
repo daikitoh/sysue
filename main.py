@@ -12,7 +12,8 @@ from dotenv import load_dotenv
 import os
 # import json
 from schemas.recipe import RequestRecipeBase
-from sqlalchemy import func
+from sqlalchemy import func, and_
+from typing import List
 
 app = FastAPI()
 
@@ -155,3 +156,65 @@ def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File()):
     return {
         'status': 'OK'
     }
+
+@app.get("/api/recipes/")
+def get_recipes(
+    category_id: int = None,
+    title: str = None,
+    description: str = None,
+    servings: int = None,
+    ingredients: List[int] = None,
+    allergens: List[int] = None,
+    tags: List[str] = None  # id?
+):
+    return session.query(
+        Recipe.id,
+        Recipe.category_id,
+        Recipe.title,
+        Recipe.image,   # 本来はサムネイル
+        func.group_concat(Tag.name)
+    )\
+    .filter(Recipe.category_id == category_id)\
+        .filter(Recipe.title.like("%" + title + "%"))\
+            .filter(Recipe.description.like("%" + description + "%"))\
+                .filter(Recipe.servings == servings)\
+                    .filter(Recipe.id.not_in(
+                        session.query(RecipeAllergen.recipe_id).filter(RecipeAllergen.allergen_id.in_(allergens))
+                    ))\
+                    .join(RecipeIngredient, and_(
+                        RecipeIngredient.recipe_id == Recipe.id,
+                        RecipeIngredient.ingredient_id.in_(ingredients)
+                    ))\
+                        .join(RecipeTag, and_(
+                            RecipeTag.recipe_id == Recipe.id,
+                            RecipeTag.tag_id.in_(tags)
+                        ))\
+                            .group_by(Recipe.id)
+
+@app.get("/api/recipe/")
+def get_recipe(id: int):
+    return session.query(
+        Recipe,
+        func.goup_concat(RecipeIngredient.ingredient_id),
+        func.goup_concat(RecipeIngredient.quantity),
+        func.goup_concat(RecipeAllergen.allergen_id),
+        func.goup_concat(RecipeTag.tag_id),
+        func.goup_concat(Instruction.number),
+        func.goup_concat(Instruction.content)
+    )\
+        .filter(Recipe.id == id)\
+            .join(RecipeIngredient, RecipeIngredient.recipe_id == Recipe.id)\
+                .join(RecipeAllergen, RecipeAllergen.recipe_id == Recipe.id)\
+                    .join(RecipeTag, RecipeTag.recipe_id == Recipe.id)\
+                        .join(Instruction, Instruction.recipe_id == Recipe.id)\
+                            .group_by(Recipe.id)
+
+@app.get("/api/ingredients/")
+def get_ingredients(keyword: str):
+    return session.query(Ingredient)\
+        .filter(Ingredient.name.like("%" + keyword + "%"))
+
+@app.get("/api/tags/")
+def get_tags(keyword: str):
+    return session.query(Tag)\
+        .filter(Tag.name.like("%" + keyword + "%"))
