@@ -29,7 +29,6 @@ class RecipeThumbBase(BaseModel):
     category_id: int
     title: str
     image: str
-    # image: str
     # description: Optional[str]
     # servings: int
     # ingredients: List[Ingredient]
