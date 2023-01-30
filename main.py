@@ -60,7 +60,7 @@ def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File()):
         # db登録
         # Check category_id
         if recipe.category_id < 1 or recipe.servings < 1:
-            raise HTTPException(status_code='404', detail='Category Error')
+            raise HTTPException(status_code=404, detail='Category Error')
 
         # Create Recipe
         db_recipe = Recipe()
@@ -145,7 +145,7 @@ def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File()):
         session.commit()
 
     except:
-        raise HTTPException(status_code='404', detail='Error')
+        raise HTTPException(status_code=404, detail='Error')
 
     finally:
         try:
@@ -195,7 +195,7 @@ def get_recipes(
         recipes = q.group_by(Recipe.id).limit(100).all()
         return recipes
     except:
-        raise HTTPException(status_code='404', detail='Error')
+        raise HTTPException(status_code=404, detail='Error')
 
 
 @app.get("/api/recipe/", response_model=RecipeBase)
@@ -204,7 +204,7 @@ def get_recipe(id: int):
         recipe = session.query(Recipe).filter(Recipe.id == id).first()
 
         if not recipe:
-            raise HTTPException(status_code='404', detail='Error')
+            raise HTTPException(status_code=404, detail='Error')
 
         recipe.ingredients = session.query(Ingredient.name, RecipeIngredient.quantity)\
             .join(RecipeIngredient, and_(RecipeIngredient.ingredient_id == Ingredient.id, RecipeIngredient.recipe_id == id)).all()
@@ -221,7 +221,7 @@ def get_recipe(id: int):
         return recipe
 
     except:
-        raise HTTPException(status_code='404', detail='Error')
+        raise HTTPException(status_code=404, detail='Error')
 
 
 @app.get("/api/ingredients/", response_model=List[IngredientBase])
@@ -231,7 +231,7 @@ def get_ingredients(keyword: str):
             .filter(Ingredient.name.like("%" + keyword + "%")).limit(100).all()
 
     except:
-        raise HTTPException(status_code='404', detail='Error')
+        raise HTTPException(status_code=404, detail='Error')
 
 
 @app.get("/api/tags/", response_model=List[TagBase])
@@ -241,4 +241,4 @@ def get_tags(keyword: str):
             .filter(Tag.name.like("%" + keyword + "%")).limit(100).all()
 
     except:
-        raise HTTPException(status_code='404', detail='Error')
+        raise HTTPException(status_code=404, detail='Error')
