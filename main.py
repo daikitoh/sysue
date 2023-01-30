@@ -201,6 +201,7 @@ def get_recipes(
 @app.get("/api/recipe/", response_model=RecipeBase)
 def get_recipe(id: int):
     try:
+        recipe = RecipeBase()
         recipe = session.query(Recipe).filter(Recipe.id == id).first()
 
         if not recipe:
