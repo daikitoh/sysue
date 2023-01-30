@@ -17,6 +17,24 @@ class RecipeIngredientBase(BaseModel):
     class Config:
         orm_mode = True
 
+class RecipeAllergenBase(BaseModel):
+    name: str
+
+    class Config:
+        orm_mode = True
+
+class RecipeTagBase(BaseModel):
+    name: str
+
+    class Config:
+        orm_mode = True
+
+class RecipeInstructionBase(BaseModel):
+    content: str
+
+    class Config:
+        orm_mode = True
+
 class TagBase(BaseModel):
     id: int
     name: str
@@ -47,12 +65,12 @@ class RecipeBase(BaseModel):
     description: Optional[str]
     servings: int
     ingredients: List[RecipeIngredientBase] #No id needed
-    allergens: Optional[List[str]]
-    tags: Optional[List[str]]
-    instructions: List[str]
+    allergens: Optional[List[RecipeAllergenBase]]
+    tags: Optional[List[RecipeTagBase]]
+    instructions: List[RecipeInstructionBase]
 
     class Config:
-        orm_mode = True
+        orm_mode = True    
 
 # For post
 class RequestRecipeBase(BaseModel):

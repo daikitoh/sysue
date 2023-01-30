@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, Body, HTTPException, Form, Query
+from fastapi import FastAPI, UploadFile, File, HTTPException, Form, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.requests import Request
@@ -11,7 +11,7 @@ import requests
 from dotenv import load_dotenv
 import os
 # import json
-from schemas.recipe import RequestRecipeBase, RecipeThumbBase, RecipeBase, IngredientBase, RecipeIngredientBase,TagBase
+from schemas.recipe import RequestRecipeBase, RecipeThumbBase, RecipeBase, IngredientBase, RecipeIngredientBase,TagBase, RecipeTagBase, RecipeAllergenBase, RecipeInstructionBase
 from sqlalchemy import func, and_
 from typing import List
 
@@ -209,13 +209,13 @@ def get_recipe(id: int):
     recipe.ingredients: List[RecipeIngredientBase] = session.query(Ingredient.name, RecipeIngredient.quantity)\
         .join(RecipeIngredient, and_(RecipeIngredient.ingredient_id == Ingredient.id, RecipeIngredient.recipe_id == id)).all()
 
-    recipe.allergens: List[str] = session.query(Allergen.name)\
+    recipe.allergens: List[RecipeAllergenBase] = session.query(Allergen.name)\
         .join(RecipeAllergen, and_(RecipeAllergen.allergen_id == Allergen.id, RecipeAllergen.recipe_id == id)).all()
 
-    recipe.tags: List[str] = session.query(Tag.name)\
+    recipe.tags: List[RecipeTagBase] = session.query(Tag.name)\
         .join(RecipeTag, and_(RecipeTag.tag_id == Tag.id, RecipeTag.recipe_id == id)).all()
 
-    recipe.instructions: List[str] = session.query(Instruction.number, Instruction.content)\
+    recipe.instructions: List[RecipeIngredientBase] = session.query(Instruction.number, Instruction.content)\
         .filter(Instruction.recipe_id == id).order_by(Instruction.number).all()
 
     return recipe
