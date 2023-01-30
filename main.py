@@ -157,6 +157,7 @@ def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File()):
         'status': 'OK'
     }
 
+
 @app.get("/api/recipes/", response_model=List[RecipeThumbBase])
 def get_recipes(
     category_id: int = None,
@@ -167,55 +168,74 @@ def get_recipes(
     allergens: List[int] = Query(default=None),
     tags: List[int] = Query(default=None)  # id?
 ):
-    joins = []
-    if ingredients:
-        joins.append((
-            RecipeIngredient, and_(RecipeIngredient.recipe_id == Recipe.id, RecipeIngredient.ingredient_id.in_(ingredients))
+    try:
+        joins = []
+        if ingredients:
+            joins.append((
+                RecipeIngredient, and_(RecipeIngredient.recipe_id == Recipe.id, RecipeIngredient.ingredient_id.in_(ingredients))
+                ))
+        if tags:
+            joins.append((
+                RecipeTag, and_(RecipeTag.recipe_id == Recipe.id, RecipeTag.tag_id.in_(tags))
             ))
-    if tags:
-        joins.append((
-            RecipeTag, and_(RecipeTag.recipe_id == Recipe.id, RecipeTag.tag_id.in_(tags))
-        ))
 
-    q = session.query(Recipe.id, Recipe.category_id, Recipe.title, Recipe.image,)\
-        .filter(Recipe.category_id == category_id if category_id else True)\
-        .filter(Recipe.title.like("%" + title + "%") if title else True)\
-        .filter(Recipe.description.like("%" + description + "%") if description else True)\
-        .filter(Recipe.servings == servings if servings else True)\
-        .filter(Recipe.id.not_in(
-            session.query(RecipeAllergen.recipe_id).filter(RecipeAllergen.allergen_id.in_(allergens))
-        ) if allergens else True)\
-        .filter(RecipeTag.tag_id.in_(tags) if tags else True)
+        q = session.query(Recipe.id, Recipe.category_id, Recipe.title, Recipe.image,)\
+            .filter(Recipe.category_id == category_id if category_id else True)\
+            .filter(Recipe.title.like("%" + title + "%") if title else True)\
+            .filter(Recipe.description.like("%" + description + "%") if description else True)\
+            .filter(Recipe.servings == servings if servings else True)\
+            .filter(Recipe.id.not_in(
+                session.query(RecipeAllergen.recipe_id).filter(RecipeAllergen.allergen_id.in_(allergens))
+            ) if allergens else True)\
+            .filter(RecipeTag.tag_id.in_(tags) if tags else True)
 
-    for j in joins:
-        q = q.join(*j)
+        for j in joins:
+            q = q.join(*j)
 
-    return q.group_by(Recipe.id).limit(100).all()
+        recipes = q.group_by(Recipe.id).limit(100).all()
+        return recipes
+    except:
+        raise HTTPException(status_code='404', detail='Error')
+
 
 @app.get("/api/recipe/", response_model=RecipeBase)
 def get_recipe(id: int):
-    recipe = session.query(Recipe).filter(Recipe.id == id).first()
+    try:
+        recipe = session.query(Recipe).filter(Recipe.id == id).first()
 
-    recipe.ingredients = session.query(Ingredient.name, RecipeIngredient.quantity)\
-        .join(RecipeIngredient, and_(RecipeIngredient.ingredient_id == Ingredient.id, RecipeIngredient.recipe_id == id)).all()
+        recipe.ingredients = session.query(Ingredient.name, RecipeIngredient.quantity)\
+            .join(RecipeIngredient, and_(RecipeIngredient.ingredient_id == Ingredient.id, RecipeIngredient.recipe_id == id)).all()
 
-    recipe.allergens = session.query(Allergen.name)\
-        .join(RecipeAllergen, and_(RecipeAllergen.allergen_id == Allergen.id, RecipeAllergen.recipe_id == id)).all()
+        recipe.allergens = session.query(Allergen.name)\
+            .join(RecipeAllergen, and_(RecipeAllergen.allergen_id == Allergen.id, RecipeAllergen.recipe_id == id)).all()
 
-    recipe.tags = session.query(Tag.name)\
-        .join(RecipeTag, and_(RecipeTag.tag_id == Tag.id, RecipeTag.recipe_id == id)).all()
+        recipe.tags = session.query(Tag.name)\
+            .join(RecipeTag, and_(RecipeTag.tag_id == Tag.id, RecipeTag.recipe_id == id)).all()
 
-    recipe.instructions = session.query(Instruction.number, Instruction.content)\
-        .filter(Instruction.recipe_id == id).order_by(Instruction.number).all()
+        recipe.instructions = session.query(Instruction.number, Instruction.content)\
+            .filter(Instruction.recipe_id == id).order_by(Instruction.number).all()
 
-    return recipe
+        return recipe
+
+    except:
+        raise HTTPException(status_code='404', detail='Error')
+
 
 @app.get("/api/ingredients/", response_model=List[IngredientBase])
 def get_ingredients(keyword: str):
-    return session.query(Ingredient)\
-        .filter(Ingredient.name.like("%" + keyword + "%")).limit(100).all()
+    try:
+        return session.query(Ingredient)\
+            .filter(Ingredient.name.like("%" + keyword + "%")).limit(100).all()
+
+    except:
+        raise HTTPException(status_code='404', detail='Error')
+
 
 @app.get("/api/tags/", response_model=List[TagBase])
 def get_tags(keyword: str):
-    return session.query(Tag)\
-        .filter(Tag.name.like("%" + keyword + "%")).limit(100).all()
+    try:
+        return session.query(Tag)\
+            .filter(Tag.name.like("%" + keyword + "%")).limit(100).all()
+            
+    except:
+        raise HTTPException(status_code='404', detail='Error')
