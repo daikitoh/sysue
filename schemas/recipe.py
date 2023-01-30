@@ -1,6 +1,5 @@
 from typing import Optional, List
 from pydantic import BaseModel
-from model import RecipeIngredientBase
 import json
 
 # For post
@@ -45,7 +44,7 @@ class RecipeIngredientBase(BaseModel):
 class TagBase(BaseModel):
     id: int
     name: str
-    
+
     class Config:
         orm_mode = True
 
