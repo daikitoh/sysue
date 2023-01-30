@@ -200,26 +200,26 @@ def get_recipes(
 
 @app.get("/api/recipe/", response_model=RecipeBase)
 def get_recipe(id: int):
-    try:
-        recipe = RecipeBase()
-        recipe = session.query(Recipe).filter(Recipe.id == id).first()
+    # try:
+    recipe = RecipeBase()
+    recipe = session.query(Recipe).filter(Recipe.id == id).first()
 
-        if not recipe:
-            raise HTTPException(status_code=404, detail='Error')
+    if not recipe:
+        raise HTTPException(status_code=404, detail='Error')
 
-        recipe.ingredients = session.query(Ingredient.name, RecipeIngredient.quantity)\
-            .join(RecipeIngredient, and_(RecipeIngredient.ingredient_id == Ingredient.id, RecipeIngredient.recipe_id == id)).all()
+    recipe.ingredients = session.query(Ingredient.name, RecipeIngredient.quantity)\
+        .join(RecipeIngredient, and_(RecipeIngredient.ingredient_id == Ingredient.id, RecipeIngredient.recipe_id == id)).all()
 
-        recipe.allergens = session.query(Allergen.name)\
-            .join(RecipeAllergen, and_(RecipeAllergen.allergen_id == Allergen.id, RecipeAllergen.recipe_id == id)).all()
+    recipe.allergens = session.query(Allergen.name)\
+        .join(RecipeAllergen, and_(RecipeAllergen.allergen_id == Allergen.id, RecipeAllergen.recipe_id == id)).all()
 
-        recipe.tags = session.query(Tag.name)\
-            .join(RecipeTag, and_(RecipeTag.tag_id == Tag.id, RecipeTag.recipe_id == id)).all()
+    recipe.tags = session.query(Tag.name)\
+        .join(RecipeTag, and_(RecipeTag.tag_id == Tag.id, RecipeTag.recipe_id == id)).all()
 
-        recipe.instructions = session.query(Instruction.number, Instruction.content)\
-            .filter(Instruction.recipe_id == id).order_by(Instruction.number).all()
+    recipe.instructions = session.query(Instruction.number, Instruction.content)\
+        .filter(Instruction.recipe_id == id).order_by(Instruction.number).all()
 
-        return recipe
+    return recipe
 
     # except:
     #     raise HTTPException(status_code=404, detail='Error')
