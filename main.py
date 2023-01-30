@@ -100,35 +100,37 @@ def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File()):
         session.add_all(db_rings)
 
         # Create RecipeAllergens
-        for al in recipe.allergens:
-            if al:
-                db_al = RecipeAllergen()
-                db_al.recipe_id = id
-                db_al.allergen_id = al
-                session.add(db_al)
+        if recipe.allergens:
+            for al in recipe.allergens:
+                if al:
+                    db_al = RecipeAllergen()
+                    db_al.recipe_id = id
+                    db_al.allergen_id = al
+                    session.add(db_al)
 
         # Create RecipeTags
-        db_rtags = list()
-        for tag in recipe.tags:
-            if tag:
-                db_rtag = RecipeTag()
-                db_rtag.recipe_id = id
+        if recipe.tags:
+            db_rtags = list()
+            for tag in recipe.tags:
+                if tag:
+                    db_rtag = RecipeTag()
+                    db_rtag.recipe_id = id
 
-                res = session.query(Tag).filter(Tag.name == func.binary(tag)).first()
-                if res is None:
-                    # Create Tag
-                    db_tag = Tag()
-                    db_tag.name = tag
-                    session.add(db_tag)
-                    session.flush()
+                    res = session.query(Tag).filter(Tag.name == func.binary(tag)).first()
+                    if res is None:
+                        # Create Tag
+                        db_tag = Tag()
+                        db_tag.name = tag
+                        session.add(db_tag)
+                        session.flush()
 
-                    db_rtag.tag_id = db_tag.id
-                else:
-                    db_rtag.tag_id = res.id
+                        db_rtag.tag_id = db_tag.id
+                    else:
+                        db_rtag.tag_id = res.id
 
-                db_rtags.append(db_rtag)
+                    db_rtags.append(db_rtag)
 
-        session.add_all(db_rtags)
+            session.add_all(db_rtags)
 
         # Create Instructions
         for index, inst in enumerate(recipe.instructions):
