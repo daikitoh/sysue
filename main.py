@@ -203,6 +203,9 @@ def get_recipe(id: int):
     try:
         recipe = session.query(Recipe).filter(Recipe.id == id).first()
 
+        if not recipe:
+            raise HTTPException(status_code='404', detail='Error')
+
         recipe.ingredients = session.query(Ingredient.name, RecipeIngredient.quantity)\
             .join(RecipeIngredient, and_(RecipeIngredient.ingredient_id == Ingredient.id, RecipeIngredient.recipe_id == id)).all()
 
@@ -236,6 +239,6 @@ def get_tags(keyword: str):
     try:
         return session.query(Tag)\
             .filter(Tag.name.like("%" + keyword + "%")).limit(100).all()
-            
+
     except:
         raise HTTPException(status_code='404', detail='Error')
