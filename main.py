@@ -167,29 +167,17 @@ def get_recipes(
     allergens: List[int] = None,
     tags: List[str] = None  # id?
 ):
-    return session.query(
-        Recipe.id,
-        Recipe.category_id,
-        Recipe.title,
-        Recipe.image,   # 本来はサムネイル
-        func.group_concat(Tag.name)
-    )\
-    .filter(Recipe.category_id == category_id)\
-        .filter(Recipe.title.like("%" + title + "%"))\
-            .filter(Recipe.description.like("%" + description + "%"))\
-                .filter(Recipe.servings == servings)\
-                    .filter(Recipe.id.not_in(
-                        session.query(RecipeAllergen.recipe_id).filter(RecipeAllergen.allergen_id.in_(allergens))
-                    ))\
-                    .join(RecipeIngredient, and_(
-                        RecipeIngredient.recipe_id == Recipe.id,
-                        RecipeIngredient.ingredient_id.in_(ingredients)
-                    ))\
-                        .join(RecipeTag, and_(
-                            RecipeTag.recipe_id == Recipe.id,
-                            RecipeTag.tag_id.in_(tags)
-                        ))\
-                            .group_by(Recipe.id)
+    return session.query(Recipe.id, Recipe.category_id, Recipe.title, Recipe.image, func.group_concat(Tag.name))\
+        .filter(Recipe.category_id == category_id if category_id else True)\
+            .filter(Recipe.title.like("%" + title + "%") if title else True)\
+                .filter(Recipe.description.like("%" + description + "%") if description else True)\
+                    .filter(Recipe.servings == servings if servings else True)\
+                        .filter(Recipe.id.not_in(
+                            session.query(RecipeAllergen.recipe_id).filter(RecipeAllergen.allergen_id.in_(allergens))
+                        ) if allergens else True)\
+                            .join(RecipeIngredient, and_(RecipeIngredient.recipe_id == Recipe.id, RecipeIngredient.ingredient_id.in_(ingredients)) if ingredients else True)\
+                                .join(RecipeTag, and_(RecipeTag.recipe_id == Recipe.id, RecipeTag.tag_id.in_(tags)) if RecipeTag else True)\
+                                    .group_by(Recipe.id)
 
 @app.get("/api/recipe/")
 def get_recipe(id: int):
