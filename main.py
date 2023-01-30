@@ -177,7 +177,7 @@ def get_recipes(
                         ) if allergens else True)\
                             .join(RecipeIngredient, and_(RecipeIngredient.recipe_id == Recipe.id, RecipeIngredient.ingredient_id.in_(ingredients)) if ingredients else True)\
                                 .join(RecipeTag, and_(RecipeTag.recipe_id == Recipe.id, RecipeTag.tag_id.in_(tags)) if RecipeTag else True)\
-                                    .group_by(Recipe.id)
+                                    .group_by(Recipe.id).all()
 
 @app.get("/api/recipe/")
 def get_recipe(id: int):
@@ -195,14 +195,14 @@ def get_recipe(id: int):
                 .join(RecipeAllergen, RecipeAllergen.recipe_id == Recipe.id)\
                     .join(RecipeTag, RecipeTag.recipe_id == Recipe.id)\
                         .join(Instruction, Instruction.recipe_id == Recipe.id)\
-                            .group_by(Recipe.id)
+                            .group_by(Recipe.id).all()
 
 @app.get("/api/ingredients/")
 def get_ingredients(keyword: str):
     return session.query(Ingredient)\
-        .filter(Ingredient.name.like("%" + keyword + "%"))
+        .filter(Ingredient.name.like("%" + keyword + "%")).all()
 
 @app.get("/api/tags/")
 def get_tags(keyword: str):
     return session.query(Tag)\
-        .filter(Tag.name.like("%" + keyword + "%"))
+        .filter(Tag.name.like("%" + keyword + "%")).all()
