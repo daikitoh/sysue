@@ -167,6 +167,12 @@ def get_recipes(
     allergens: List[int] = None,
     tags: List[str] = None  # id?
 ):
+    joins = []
+    if ingredients:
+        joins.append(RecipeIngredient, and_(RecipeIngredient.recipe_id == Recipe.id, RecipeIngredient.ingredient_id.in_(ingredients)))
+    if tags:
+        joins.append(RecipeTag, and_(RecipeTag.recipe_id == Recipe.id, RecipeTag.tag_id.in_(tags)))
+
     return session.query(Recipe.id, Recipe.category_id, Recipe.title, Recipe.image, func.group_concat(Tag.name))\
         .filter(Recipe.category_id == category_id if category_id else True)\
             .filter(Recipe.title.like("%" + title + "%") if title else True)\
@@ -175,9 +181,8 @@ def get_recipes(
                         .filter(Recipe.id.not_in(
                             session.query(RecipeAllergen.recipe_id).filter(RecipeAllergen.allergen_id.in_(allergens))
                         ) if allergens else True)\
-                            .join(RecipeIngredient, and_(RecipeIngredient.recipe_id == Recipe.id, RecipeIngredient.ingredient_id.in_(ingredients)) if ingredients else True)\
-                                .join(RecipeTag, and_(RecipeTag.recipe_id == Recipe.id, RecipeTag.tag_id.in_(tags)) if RecipeTag else True)\
-                                    .group_by(Recipe.id).all()
+                            .join(and_(*joins))\
+                                .group_by(Recipe.id).all()
 
 @app.get("/api/recipe/")
 def get_recipe(id: int):
