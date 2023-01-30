@@ -26,3 +26,56 @@ class RequestRecipeBase(BaseModel):
 
     # class Config:
     #     orm_mode = True
+
+#  For Responses
+class IngredientBase(BaseModel):
+    id: int
+    name: str
+
+    class Config:
+        orm_mode = True
+
+class RecipeIngredientBase(BaseModel):
+    name: str
+    quantity: str
+
+    class Config:
+        orm_mode = True
+
+class TagBase(BaseModel):
+    id: int
+    name: str
+    
+    class Config:
+        orm_mode = True
+
+class RecipeThumbBase(BaseModel):
+    id: int
+    category_id: int
+    title: str
+    image: str
+    # image: str
+    # description: Optional[str]
+    # servings: int
+    # ingredients: List[Ingredient]
+    # allergens: Optional[List[str]]
+    tags: Optional[List[str]]
+    # instructions: List[str]
+
+    class Config:
+        orm_mode = True
+
+class RecipeBase(BaseModel):
+    id: int
+    category_id: int
+    title: str
+    image: str
+    description: Optional[str]
+    servings: int
+    ingredients: List[RecipeIngredientBase] #No id needed
+    allergens: Optional[List[str]]
+    tags: Optional[List[str]]
+    instructions: List[str]
+
+    class Config:
+        orm_mode = True

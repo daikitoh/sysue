@@ -11,7 +11,7 @@ import requests
 from dotenv import load_dotenv
 import os
 # import json
-from schemas.recipe import RequestRecipeBase
+from schemas.recipe import RequestRecipeBase, RecipeThumbBase, RecipeBase, IngredientBase, RecipeIngredientBase,TagBase
 from sqlalchemy import func, and_
 from typing import List
 
@@ -157,7 +157,7 @@ def post_recipe(recipe: RequestRecipeBase = Form(), image: UploadFile = File()):
         'status': 'OK'
     }
 
-@app.get("/api/recipes/")
+@app.get("/api/recipes/", response_model=RecipeThumbBase)
 def get_recipes(
     category_id: int = None,
     title: str = None,
@@ -192,7 +192,7 @@ def get_recipes(
     print(res)
     return res
 
-@app.get("/api/recipe/")
+@app.get("/api/recipe/", response_model=RecipeBase)
 def get_recipe(id: int):
     return session.query(
         Recipe,
@@ -212,12 +212,12 @@ def get_recipe(id: int):
                                 .join(Instruction, Instruction.recipe_id == Recipe.id)\
                                     .group_by(Recipe.id).limit(100).all()
 
-@app.get("/api/ingredients/")
+@app.get("/api/ingredients/", response_model=IngredientBase)
 def get_ingredients(keyword: str):
     return session.query(Ingredient)\
         .filter(Ingredient.name.like("%" + keyword + "%")).limit(100).all()
 
-@app.get("/api/tags/")
+@app.get("/api/tags/", response_model=TagBase)
 def get_tags(keyword: str):
     return session.query(Tag)\
         .filter(Tag.name.like("%" + keyword + "%")).limit(100).all()

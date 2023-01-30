@@ -1,7 +1,5 @@
 from sqlalchemy import Column, Integer, String, DATETIME, FetchedValue
-from pydantic import BaseModel
 from database import Base
-from typing import Optional, List
 
 class Recipe(Base):
     __tablename__ = 'recipes'
@@ -54,38 +52,3 @@ class Instruction(Base):
     recipe_id = Column(Integer)
     number = Column(Integer)
     content = Column(String(255))
-
-
-
-#  For Responses
-#  For Search
-class IngredientBase(BaseModel):
-    id: int
-    name: str
-
-class RecipeIngredientBase(BaseModel):
-    name: str
-    quantity: str
-
-class RecipeThumbBase(BaseModel):
-    category_id: int
-    title: str
-    thumb: str
-    # image: str
-    # description: Optional[str]
-    servings: int
-    # ingredients: List[Ingredient]
-    # allergens: Optional[List[str]]
-    tags: Optional[List[str]]
-    # instructions: List[str]
-
-class RecipeBase(BaseModel):
-    category_id: int
-    title: str
-    image: str
-    description: Optional[str]
-    servings: int
-    ingredients: List[RecipeIngredientBase] #No id needed
-    allergens: Optional[List[str]]
-    tags: Optional[List[str]]
-    instructions: List[str]
