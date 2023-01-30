@@ -165,7 +165,7 @@ def get_recipes(
     servings: int = None,
     ingredients: List[int] = Query(default=None),
     allergens: List[int] = Query(default=None),
-    tags: List[str] = Query(default=None)  # id?
+    tags: List[int] = Query(default=None)  # id?
 ):
     joins = []
     if ingredients:
@@ -174,16 +174,16 @@ def get_recipes(
             ))
 
     q = session.query(Recipe.id, Recipe.category_id, Recipe.title, Recipe.image, func.group_concat(Tag.name))\
-        .outerjoin(RecipeTag, RecipeTag.recipe_id == Recipe.id)\
-            .outerjoin(Tag, Tag.id == RecipeTag.tag_id)\
-                .filter(Recipe.category_id == category_id if category_id else True)\
-                    .filter(Recipe.title.like("%" + title + "%") if title else True)\
-                        .filter(Recipe.description.like("%" + description + "%") if description else True)\
-                            .filter(Recipe.servings == servings if servings else True)\
-                                .filter(Recipe.id.not_in(
-                                    session.query(RecipeAllergen.recipe_id).filter(RecipeAllergen.allergen_id.in_(allergens))
-                                ) if allergens else True)\
-                                    .filter(RecipeTag.tag_id.in_(tags) if tags else True)
+        .join(RecipeTag, RecipeTag.recipe_id == Recipe.id)\
+        .join(Tag, Tag.id == RecipeTag.tag_id)\
+        .filter(Recipe.category_id == category_id if category_id else True)\
+        .filter(Recipe.title.like("%" + title + "%") if title else True)\
+        .filter(Recipe.description.like("%" + description + "%") if description else True)\
+        .filter(Recipe.servings == servings if servings else True)\
+        .filter(Recipe.id.not_in(
+            session.query(RecipeAllergen.recipe_id).filter(RecipeAllergen.allergen_id.in_(allergens))
+        ) if allergens else True)\
+        .filter(RecipeTag.tag_id.in_(tags) if tags else True)
 
     for j in joins:
         q = q.join(*j)
