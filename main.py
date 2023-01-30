@@ -221,8 +221,8 @@ def get_recipe(id: int):
 
         return recipe
 
-    except:
-        raise HTTPException(status_code=404, detail='Error')
+    # except:
+    #     raise HTTPException(status_code=404, detail='Error')
 
 
 @app.get("/api/ingredients/", response_model=List[IngredientBase])
