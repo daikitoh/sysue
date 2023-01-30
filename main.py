@@ -169,18 +169,22 @@ def get_recipes(
 ):
     joins = []
     if ingredients:
-        joins.append((RecipeIngredient, and_(RecipeIngredient.recipe_id == Recipe.id, RecipeIngredient.ingredient_id.in_(ingredients))))
-    if tags:
-        joins.append((RecipeTag, and_(RecipeTag.recipe_id == Recipe.id, RecipeTag.tag_id.in_(tags))))
+        joins.append((
+            RecipeIngredient, and_(RecipeIngredient.recipe_id == Recipe.id, RecipeIngredient.ingredient_id.in_(ingredients))
+            ))
 
     q = session.query(Recipe.id, Recipe.category_id, Recipe.title, Recipe.image, func.group_concat(Tag.name))\
-        .filter(Recipe.category_id == category_id if category_id else True)\
-            .filter(Recipe.title.like("%" + title + "%") if title else True)\
-                .filter(Recipe.description.like("%" + description + "%") if description else True)\
-                    .filter(Recipe.servings == servings if servings else True)\
-                        .filter(Recipe.id.not_in(
-                            session.query(RecipeAllergen.recipe_id).filter(RecipeAllergen.allergen_id.in_(allergens))
-                        ) if allergens else True)
+        .join(Tag, Tag.id == RecipeTag.tag_id)\
+            .join(RecipeTag, RecipeTag.recipe_id == Recipe.id)\
+                .filter(Recipe.category_id == category_id if category_id else True)\
+                    .filter(Recipe.title.like("%" + title + "%") if title else True)\
+                        .filter(Recipe.description.like("%" + description + "%") if description else True)\
+                            .filter(Recipe.servings == servings if servings else True)\
+                                .filter(Recipe.id.not_in(
+                                    session.query(RecipeAllergen.recipe_id).filter(RecipeAllergen.allergen_id.in_(allergens))
+                                ) if allergens else True)\
+                                    .filter(RecipeTag.tag_id.in_(tags) if tags else True)
+
     for j in joins:
         q = q.join(*j)
 
@@ -190,19 +194,21 @@ def get_recipes(
 def get_recipe(id: int):
     return session.query(
         Recipe,
-        func.goup_concat(RecipeIngredient.ingredient_id),
+        func.goup_concat(Ingredient.name),
         func.goup_concat(RecipeIngredient.quantity),
-        func.goup_concat(RecipeAllergen.allergen_id),
-        func.goup_concat(RecipeTag.tag_id),
+        func.goup_concat(Allergen.name),
+        func.goup_concat(Tag.name),
         func.goup_concat(Instruction.number),
         func.goup_concat(Instruction.content)
     )\
         .filter(Recipe.id == id)\
-            .join(RecipeIngredient, RecipeIngredient.recipe_id == Recipe.id)\
-                .join(RecipeAllergen, RecipeAllergen.recipe_id == Recipe.id)\
-                    .join(RecipeTag, RecipeTag.recipe_id == Recipe.id)\
-                        .join(Instruction, Instruction.recipe_id == Recipe.id)\
-                            .group_by(Recipe.id).all()
+            .join(Ingredient, Ingredient.id == RecipeIngredient.ingredient_id)\
+                .join(RecipeIngredient, RecipeIngredient.recipe_id == Recipe.id)\
+                    .join(RecipeAllergen, RecipeAllergen.recipe_id == Recipe.id)\
+                        .join(Tag, Tag.id == RecipeTag.id)\
+                            .join(RecipeTag, RecipeTag.recipe_id == Recipe.id)\
+                                .join(Instruction, Instruction.recipe_id == Recipe.id)\
+                                    .group_by(Recipe.id).all()
 
 @app.get("/api/ingredients/")
 def get_ingredients(keyword: str):
