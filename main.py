@@ -174,8 +174,8 @@ def get_recipes(
             ))
 
     q = session.query(Recipe.id, Recipe.category_id, Recipe.title, Recipe.image, func.group_concat(Tag.name))\
-        .join(Tag, Tag.id == RecipeTag.tag_id)\
-            .join(RecipeTag, RecipeTag.recipe_id == Recipe.id)\
+        .join(RecipeTag, RecipeTag.recipe_id == Recipe.id)\
+            .join(Tag, Tag.id == RecipeTag.tag_id)\
                 .filter(Recipe.category_id == category_id if category_id else True)\
                     .filter(Recipe.title.like("%" + title + "%") if title else True)\
                         .filter(Recipe.description.like("%" + description + "%") if description else True)\
@@ -202,8 +202,8 @@ def get_recipe(id: int):
         func.goup_concat(Instruction.content)
     )\
         .filter(Recipe.id == id)\
-            .join(Ingredient, Ingredient.id == RecipeIngredient.ingredient_id)\
-                .join(RecipeIngredient, RecipeIngredient.recipe_id == Recipe.id)\
+            .join(RecipeIngredient, RecipeIngredient.recipe_id == Recipe.id)\
+                .join(Ingredient, Ingredient.id == RecipeIngredient.ingredient_id)\
                     .join(RecipeAllergen, RecipeAllergen.recipe_id == Recipe.id)\
                         .join(Tag, Tag.id == RecipeTag.id)\
                             .join(RecipeTag, RecipeTag.recipe_id == Recipe.id)\
