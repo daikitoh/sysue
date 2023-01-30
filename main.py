@@ -200,32 +200,34 @@ def get_recipes(
 
 @app.get("/api/recipe/", response_model=RecipeBase)
 def get_recipe(id: int):
-    # try:
-    recipe = session.query(Recipe).filter(Recipe.id == id).first()
+    try:
+        recipe = session.query(Recipe).filter(Recipe.id == id).first()
 
-    if not recipe:
+        if not recipe:
+            raise HTTPException(status_code=404, detail='Error')
+
+        recipe.ingredients: List[RecipeIngredientBase] = session.query(Ingredient.name, RecipeIngredient.quantity)\
+            .join(RecipeIngredient, and_(RecipeIngredient.ingredient_id == Ingredient.id, RecipeIngredient.recipe_id == id)).all()
+
+        recipe.allergens: List[RecipeAllergenBase] = session.query(Allergen.name)\
+            .join(RecipeAllergen, and_(RecipeAllergen.allergen_id == Allergen.id, RecipeAllergen.recipe_id == id)).all()
+
+        recipe.tags: List[RecipeTagBase] = session.query(Tag.name)\
+            .join(RecipeTag, and_(RecipeTag.tag_id == Tag.id, RecipeTag.recipe_id == id)).all()
+
+        recipe.instructions: List[RecipeIngredientBase] = session.query(Instruction.number, Instruction.content)\
+            .filter(Instruction.recipe_id == id).order_by(Instruction.number).all()
+
+        return recipe
+
+    except:
         raise HTTPException(status_code=404, detail='Error')
-
-    recipe.ingredients: List[RecipeIngredientBase] = session.query(Ingredient.name, RecipeIngredient.quantity)\
-        .join(RecipeIngredient, and_(RecipeIngredient.ingredient_id == Ingredient.id, RecipeIngredient.recipe_id == id)).all()
-
-    recipe.allergens: List[RecipeAllergenBase] = session.query(Allergen.name)\
-        .join(RecipeAllergen, and_(RecipeAllergen.allergen_id == Allergen.id, RecipeAllergen.recipe_id == id)).all()
-
-    recipe.tags: List[RecipeTagBase] = session.query(Tag.name)\
-        .join(RecipeTag, and_(RecipeTag.tag_id == Tag.id, RecipeTag.recipe_id == id)).all()
-
-    recipe.instructions: List[RecipeIngredientBase] = session.query(Instruction.number, Instruction.content)\
-        .filter(Instruction.recipe_id == id).order_by(Instruction.number).all()
-
-    return recipe
-
-    # except:
-    #     raise HTTPException(status_code=404, detail='Error')
 
 
 @app.get("/api/ingredients/", response_model=List[IngredientBase])
 def get_ingredients(keyword: str):
+    if not keyword or keyword.isspace():
+        raise HTTPException(status_code=404, detail='Error')
     try:
         return session.query(Ingredient)\
             .filter(Ingredient.name.like("%" + keyword + "%")).limit(100).all()
@@ -236,6 +238,8 @@ def get_ingredients(keyword: str):
 
 @app.get("/api/tags/", response_model=List[TagBase])
 def get_tags(keyword: str):
+    if not keyword or keyword.isspace():
+        raise HTTPException(status_code=404, detail='Error')
     try:
         return session.query(Tag)\
             .filter(Tag.name.like("%" + keyword + "%")).limit(100).all()
