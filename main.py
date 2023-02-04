@@ -169,7 +169,7 @@ def get_recipes(
     tags: List[int] = Query(default=None)  # id?
 ):
     if not category_id and not title and not description and not servings and not ingredients and not allergens and not tags:
-        raise HTTPException(status_code=404, detail='Error')
+        raise HTTPException(status_code=404, detail='Invalid Request')
         
     try:
         joins = []
@@ -197,8 +197,8 @@ def get_recipes(
 
         recipes = q.group_by(Recipe.id).limit(100).all()
         return recipes
-    except:
-        raise HTTPException(status_code=404, detail='Error')
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=e)
 
 
 @app.get("/api/recipe/", response_model=RecipeBase)
@@ -207,7 +207,7 @@ def get_recipe(id: int):
         recipe = session.query(Recipe).filter(Recipe.id == id).first()
 
         if not recipe:
-            raise HTTPException(status_code=404, detail='Error')
+            raise HTTPException(status_code=404, detail='No result')
 
         recipe.ingredients: List[RecipeIngredientBase] = session.query(Ingredient.name, RecipeIngredient.quantity)\
             .join(RecipeIngredient, and_(RecipeIngredient.ingredient_id == Ingredient.id, RecipeIngredient.recipe_id == id)).all()
@@ -223,29 +223,29 @@ def get_recipe(id: int):
 
         return recipe
 
-    except:
-        raise HTTPException(status_code=404, detail='Error')
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=e)
 
 
 @app.get("/api/ingredients/", response_model=List[IngredientBase])
 def get_ingredients(keyword: str):
     if not keyword or keyword.isspace():
-        raise HTTPException(status_code=404, detail='Error')
+        raise HTTPException(status_code=404, detail='Invalid Request')
     try:
         return session.query(Ingredient)\
             .filter(Ingredient.name.like("%" + keyword + "%")).limit(100).all()
 
-    except:
-        raise HTTPException(status_code=404, detail='Error')
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=e)
 
 
 @app.get("/api/tags/", response_model=List[TagBase])
 def get_tags(keyword: str):
     if not keyword or keyword.isspace():
-        raise HTTPException(status_code=404, detail='Error')
+        raise HTTPException(status_code=404, detail='Invalid Request')
     try:
         return session.query(Tag)\
             .filter(Tag.name.like("%" + keyword + "%")).limit(100).all()
 
-    except:
-        raise HTTPException(status_code=404, detail='Error')
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=e)
