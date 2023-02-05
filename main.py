@@ -174,13 +174,21 @@ def get_recipes(
     try:
         joins = []
         if ingredients:
-            joins.append((
-                RecipeIngredient, and_(RecipeIngredient.recipe_id == Recipe.id, RecipeIngredient.ingredient_id.in_(ingredients))
-                ))
+            for i in ingredients:
+                joins.append(
+                    RecipeIngredient, and_(RecipeIngredient.recipe_id == Recipe.id, RecipeIngredient.ingredient_id == i)
+                )
+            # joins.append((
+            #     RecipeIngredient, and_(RecipeIngredient.recipe_id == Recipe.id, RecipeIngredient.ingredient_id.in_(ingredients))
+            # ))
         if tags:
-            joins.append((
-                RecipeTag, and_(RecipeTag.recipe_id == Recipe.id, RecipeTag.tag_id.in_(tags))
-            ))
+            for t in tags:
+                joins.append(
+                    RecipeTag, and_(RecipeTag.recipe_id == Recipe.id, RecipeTag.tag_id == t)
+                )
+            # joins.append((
+            #     RecipeTag, and_(RecipeTag.recipe_id == Recipe.id, RecipeTag.tag_id.in_(tags))
+            # ))
 
         q = session.query(Recipe.id, Recipe.category_id, Recipe.title, Recipe.image,)\
             .filter(Recipe.category_id == category_id if category_id else True)\
