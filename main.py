@@ -173,8 +173,8 @@ def get_recipes(
         
     try:
         joins = []
-        ings = []
-        tgs = []
+        ings = [0] * len(ingredients)
+        tgs = [0] * len(tags)
         if ingredients:
             for index, i in enumerate(ingredients):
                 ings[index] = alias(RecipeIngredient)
