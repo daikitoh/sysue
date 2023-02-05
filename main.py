@@ -175,17 +175,17 @@ def get_recipes(
         joins = []
         if ingredients:
             for i in ingredients:
-                joins.append(
+                joins.append((
                     RecipeIngredient, and_(RecipeIngredient.recipe_id == Recipe.id, RecipeIngredient.ingredient_id == i)
-                )
+                ))
             # joins.append((
             #     RecipeIngredient, and_(RecipeIngredient.recipe_id == Recipe.id, RecipeIngredient.ingredient_id.in_(ingredients))
             # ))
         if tags:
             for t in tags:
-                joins.append(
+                joins.append((
                     RecipeTag, and_(RecipeTag.recipe_id == Recipe.id, RecipeTag.tag_id == t)
-                )
+                ))
             # joins.append((
             #     RecipeTag, and_(RecipeTag.recipe_id == Recipe.id, RecipeTag.tag_id.in_(tags))
             # ))
