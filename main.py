@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 import os
 # import json
 from schemas.recipe import RequestRecipeBase, RecipeThumbBase, RecipeBase, IngredientBase, RecipeIngredientBase,TagBase, RecipeTagBase, RecipeAllergenBase, RecipeInstructionBase
-from sqlalchemy import func, and_
+from sqlalchemy import func, and_, alias
 from typing import List
 
 app = FastAPI()
@@ -173,18 +173,22 @@ def get_recipes(
         
     try:
         joins = []
+        ings = []
+        tgs = []
         if ingredients:
-            for i in ingredients:
+            for index, i in enumerate(ingredients):
+                ings[index] = alias(RecipeIngredient)
                 joins.append((
-                    RecipeIngredient, and_(RecipeIngredient.recipe_id == Recipe.id, RecipeIngredient.ingredient_id == i)
+                    ings[index], and_(ings[index].recipe_id == Recipe.id, ings[index].ingredient_id == i)
                 ))
             # joins.append((
             #     RecipeIngredient, and_(RecipeIngredient.recipe_id == Recipe.id, RecipeIngredient.ingredient_id.in_(ingredients))
             # ))
         if tags:
-            for t in tags:
+            for index, t in enumerate(tags):
+                tgs[index] = alias(RecipeTag)
                 joins.append((
-                    RecipeTag, and_(RecipeTag.recipe_id == Recipe.id, RecipeTag.tag_id == t)
+                    tgs[index], and_(tgs[index].recipe_id == Recipe.id, tgs[index].tag_id == t)
                 ))
             # joins.append((
             #     RecipeTag, and_(RecipeTag.recipe_id == Recipe.id, RecipeTag.tag_id.in_(tags))
