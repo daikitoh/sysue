@@ -169,7 +169,7 @@ def get_recipes(
     allergens: List[int] = Query(default=None),
     tags: List[int] = Query(default=None)  # id?
 ):
-    if not category_id and not title and not description and not servings and not ingredients and not allergens and not tags:
+    if not category_id and not title and not description and not servings and not ingredients and not tags:
         raise HTTPException(status_code=404, detail='Invalid Request')
         
     try:
@@ -216,6 +216,8 @@ def get_recipes(
 
 @app.get("/api/recipe/", response_model=RecipeBase)
 def get_recipe(id: int):
+    if not id:
+        raise HTTPException(status_code=404, detail="Invalid request")
     try:
         recipe = session.query(Recipe).filter(Recipe.id == id).first()
 
@@ -237,7 +239,7 @@ def get_recipe(id: int):
         return recipe
 
     except Exception as e:
-        raise HTTPException(status_code=404, detail=e)
+        raise HTTPException(status_code=404, detail=str(e))
 
 
 @app.get("/api/ingredients/", response_model=List[IngredientBase])
